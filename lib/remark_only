@@ -1,0 +1,5 @@
+ try {
+     await fetchData();
+   } catch (e) {
+     showSnackBar('Failed to load data');
+   }
