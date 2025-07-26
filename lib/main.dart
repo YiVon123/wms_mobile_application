@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:wms_mobile_application/providers/event_provider.dart';
+import 'package:wms_mobile_application/providers/service_provider.dart';
 import 'screens/home_page.dart';
 import 'screens/schedule_page.dart';
 import 'screens/profile_page.dart';
@@ -13,7 +12,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       // accessible for all pages
-        create: (context) => EventProvider(),
+        create: (context) => ServiceProvider(),
         child: const MyApp(),
     ),
   );

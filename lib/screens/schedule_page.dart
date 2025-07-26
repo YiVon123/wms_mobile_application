@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:wms_mobile_application/providers/event_provider.dart';
-import 'package:wms_mobile_application/models/event.dart';
 import 'package:wms_mobile_application/constants/colors.dart';
+import 'package:wms_mobile_application/widgets/PastServicesLists.dart';
+import 'package:wms_mobile_application/widgets/OnProgressServicesList.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
@@ -21,9 +20,9 @@ class _SchedulePageState extends State<SchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-    final eventProvider = Provider.of<EventProvider>(
-      context,
-    ); // Access EventProvider
+    // final serviceProvider = Provider.of<ServiceProvider>(
+    //   context,
+    // ); // Access serviceProvider
     return Scaffold(
       appBar: null,
       backgroundColor: AppColors.white,
@@ -31,27 +30,21 @@ class _SchedulePageState extends State<SchedulePage> {
         length: myTabs.length,
         child: SafeArea(
           child: Column(
-              children: [
-                TabBar(
-                    tabs: myTabs,
+            children: [
+              TabBar(tabs: myTabs),
+
+              // Content of each tab bar
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    Center(),
+
+                    Center(child: PastServicesList()),
+                    Center(child: OnProgressServicesList()),
+                  ],
                 ),
-
-                // Content of each tab bar
-                Expanded(
-                    child: TabBarView(
-                        children: [
-                          Center(
-
-                              ),
-
-
-
-                          Center(child: Text('Past')),
-                          Center(child: Text('On Progress')),
-                        ],
-                    ),
-                ),
-              ],
+              ),
+            ],
           ),
         ),
       ),
