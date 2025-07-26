@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wms_mobile_application/constants/colors.dart';
-import 'package:wms_mobile_application/widgets/PastServicesLists.dart';
-import 'package:wms_mobile_application/widgets/OnProgressServicesList.dart';
+import 'package:wms_mobile_application/widgets/past_list.dart';
+import 'package:wms_mobile_application/widgets/on_progress_list.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
