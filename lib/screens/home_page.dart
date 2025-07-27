@@ -296,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                     // Make Appointment button
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _showAppointmentDialog,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow[700],
                           padding: const EdgeInsets.symmetric(
@@ -360,6 +360,145 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAppointmentDialog() {
+    final TextEditingController _dateController = TextEditingController();
+    final TextEditingController _timeController = TextEditingController();
+    String selectedCar = '${_cars[_currentPage].name} - ${_cars[_currentPage].plateNumber}';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Back Button and Title Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          Navigator.pop(context); // Closes the dialog
+                        },
+                      ),
+                      const Text(
+                        "Car Service",
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 48), // Spacer to balance the Row
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  /// 1. Car Selection
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("1. Select your car", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    value: selectedCar,
+                    items: _cars.map((car) {
+                      return DropdownMenuItem<String>(
+                        value: '${car.name} - ${car.plateNumber}',
+                        child: Text('${car.name} - ${car.plateNumber}'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      selectedCar = value!;
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  /// 2. Date Picker
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("2. Select the service date", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 5),
+                  TextField(
+                    controller: _dateController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: 'mm/dd/yyyy',
+                      prefixIcon: const Icon(Icons.calendar_today),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        _dateController.text = "${pickedDate.month}/${pickedDate.day}/${pickedDate.year}";
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  /// 3. Time Picker
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("3. Select the service time", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 5),
+                  TextField(
+                    controller: _timeController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: 'e.g. 12:00 pm',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onTap: () async {
+                      final pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (pickedTime != null) {
+                        _timeController.text = pickedTime.format(context);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  /// Confirm Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightBlue[100],
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.black, width: 1)),
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    ),
+                    onPressed: () {
+                      if (_dateController.text.isNotEmpty && _timeController.text.isNotEmpty) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Appointment Confirmed!")),
+                        );
+                      }
+                    },
+                    child: const Text("Confirm Appointment", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
