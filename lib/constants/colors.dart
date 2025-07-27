@@ -6,4 +6,5 @@ class AppColors {
   static const blue = Colors.blue;
   static const white = Colors.white;
   static final grey = Colors.grey[400]!;
+  static final lightGrey = Colors.grey[200]!;
 }

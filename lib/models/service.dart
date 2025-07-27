@@ -1,5 +1,5 @@
 
-enum EventStatus {
+enum ServiceStatus {
   // upcoming
   pending, confirmed,
   // on progress
@@ -7,14 +7,14 @@ enum EventStatus {
   // past
   completed, cancelled}
 
-class Event{
+class Service{
   final String title;
   final String date;
   final String time;
   final DateTime dateTime;
-  EventStatus status;
+  ServiceStatus status;
 
-  Event ({
+  Service ({
     required this.title,
     required this.date,
     required this.time,
@@ -22,8 +22,8 @@ class Event{
     required this.status,
   });
 
-  void cancelEvent(){
-    status = EventStatus.cancelled;
+  void cancelservice(){
+    status = ServiceStatus.cancelled;
   }
 
 }
