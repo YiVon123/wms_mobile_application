@@ -1,102 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/car_provider.dart';
 
-// A simple data model for a car
-class Car {
-  String name;
-  String plateNumber;
-  String imagePath;
-
-  Car({required this.name, required this.plateNumber, required this.imagePath});
-}
-
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  // A list of cars to be displayed. This can be fetched from a database or API in a real app.
-  final List<Car> _cars = [
-    Car(
-      name: 'Proton Saga',
-      plateNumber: 'WC 1234',
-      imagePath: 'assets/images/proton_saga.png',
-    ),
-    Car(
-      name: 'Honda Civic',
-      plateNumber: 'ABC 5678',
-      imagePath: 'assets/images/honda_civic.png',
-    ),
-    // Add more cars as needed
-  ];
-
-  // Controller for the PageView
-  final PageController _pageController = PageController();
-
-  // Controller for the text field to edit the car plate
-  late TextEditingController _plateController;
-
-  // State variables
-  int _currentPage = 0;
-  bool _isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the text controller with the first car's plate number
-    _plateController = TextEditingController(text: _cars[0].plateNumber);
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page!.round();
-        _plateController.text = _cars[_currentPage].plateNumber;
-        _isEditing = false; // Exit edit mode when page changes
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _plateController.dispose();
-    super.dispose();
-  }
-
-  void _addCar() {
-    setState(() {
-      _cars.add(
-        Car(
-          name: 'New Car',
-          plateNumber: 'NEW 0000',
-          imagePath: 'assets/images/placeholder_car.png', // Placeholder image
-        ),
-      );
-      // Scroll to the new car after adding it
-      _pageController.animateToPage(
-        _cars.length - 1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
-    });
-  }
-
-  void _toggleEditMode() {
-    setState(() {
-      _isEditing = !_isEditing;
-      if (!_isEditing) {
-        // Save the new plate number
-        _cars[_currentPage].plateNumber = _plateController.text;
-        // Optionally, save to a database here
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Car plate saved!')),
-        );
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final carProvider = Provider.of<CarProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -117,12 +29,12 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Car section
               SizedBox(
-                height: 250, // Height for the PageView
+                height: 250,
                 child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _cars.length,
+                  controller: carProvider.pageController,
+                  itemCount: carProvider.cars.length,
                   itemBuilder: (context, index) {
-                    final car = _cars[index];
+                    final car = carProvider.cars[index];
                     return Container(
                       margin: const EdgeInsets.all(16.0),
                       padding: const EdgeInsets.all(16.0),
@@ -153,12 +65,19 @@ class _HomePageState extends State<HomePage> {
                               ),
                               IconButton(
                                 icon: Icon(
-                                  _isEditing
+                                  carProvider.isEditing
                                       ? Icons.save
                                       : Icons.edit_outlined,
-                                  color: _isEditing ? Colors.green : null,
+                                  color: carProvider.isEditing ? Colors.green : null,
                                 ),
-                                onPressed: _toggleEditMode,
+                                onPressed: () {
+                                  carProvider.toggleEditMode();
+                                  if (!carProvider.isEditing) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Car plate saved!')),
+                                    );
+                                  }
+                                },
                               ),
                             ],
                           ),
@@ -171,9 +90,9 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: Colors.grey.shade300),
                             ),
-                            child: _isEditing && _currentPage == index
+                            child: carProvider.isEditing && carProvider.currentPage == index
                                 ? TextFormField(
-                              controller: _plateController,
+                              controller: carProvider.plateController,
                               decoration: const InputDecoration(
                                 isDense: true,
                                 contentPadding: EdgeInsets.zero,
@@ -209,13 +128,13 @@ class _HomePageState extends State<HomePage> {
               // Page indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_cars.length, (index) {
+                children: List.generate(carProvider.cars.length, (index) {
                   return Container(
                     width: 8,
                     height: 8,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
-                      color: _currentPage == index
+                      color: carProvider.currentPage == index
                           ? Colors.blue
                           : Colors.grey[300],
                       borderRadius: BorderRadius.circular(4),
@@ -228,7 +147,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ElevatedButton(
-                  onPressed: _addCar,
+                  onPressed: () => _showAddCarDialog(context, carProvider),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -273,21 +192,16 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         TableRow(
                           children: [
-                            _buildServiceIcon(
-                                'Maintenance', Icons.build_outlined),
-                            _buildServiceIcon(
-                                'Engine', Icons.engineering_outlined),
-                            _buildServiceIcon(
-                                'Breakdown', Icons.directions_car_filled),
+                            _buildServiceIcon('Maintenance', Icons.build_outlined),
+                            _buildServiceIcon('Engine', Icons.engineering_outlined),
+                            _buildServiceIcon('Breakdown', Icons.directions_car_filled),
                           ],
                         ),
                         TableRow(
                           children: [
-                            _buildServiceIcon(
-                                'Inspection', Icons.car_rental_outlined),
+                            _buildServiceIcon('Inspection', Icons.car_rental_outlined),
                             _buildServiceIcon('Gear', Icons.settings_outlined),
-                            _buildServiceIcon(
-                                'Service', Icons.handyman_outlined),
+                            _buildServiceIcon('Service', Icons.handyman_outlined),
                           ],
                         ),
                       ],
@@ -296,11 +210,10 @@ class _HomePageState extends State<HomePage> {
                     // Make Appointment button
                     Center(
                       child: ElevatedButton(
-                        onPressed: _showAppointmentDialog,
+                        onPressed: () => _showAppointmentDialog(context, carProvider),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow[700],
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 60, vertical: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -363,10 +276,150 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showAppointmentDialog() {
+  void _showAddCarDialog(BuildContext context, CarProvider carProvider) {
+    final List<Map<String, String>> carModels = [
+      {'name': 'Perodua Myvi', 'imagePath': 'assets/images/perodua_myvi.png'},
+      {'name': 'Honda City', 'imagePath': 'assets/images/honda_city.png'},
+      {'name': 'Toyota Vios', 'imagePath': 'assets/images/toyota_vios.png'},
+    ];
+
+    final TextEditingController plateController = TextEditingController();
+    String? selectedCarModel;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Add New Car",
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("1. Select Car Model", style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 16.0,
+                        runSpacing: 16.0,
+                        children: carModels.map((car) {
+                          bool isSelected = selectedCarModel == car['name'];
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCarModel = car['name'];
+                              });
+                            },
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.blue.shade100 : Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: isSelected
+                                    ? Border.all(color: Colors.blue.shade700, width: 2)
+                                    : Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(car['imagePath']!, height: 50),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    car['name']!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      color: isSelected ? Colors.blue.shade700 : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      if (selectedCarModel != null)
+                        Column(
+                          children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("2. Input Car Plate Number", style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: plateController,
+                              decoration: InputDecoration(
+                                hintText: 'e.g. ABC 1234',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  borderSide: BorderSide(color: Colors.blue.shade700, width: 2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (selectedCarModel != null && plateController.text.isNotEmpty) {
+                            final newCarImagePath = carModels.firstWhere(
+                                  (car) => car['name'] == selectedCarModel,
+                            )['imagePath']!;
+                            carProvider.addCar(selectedCarModel!, plateController.text, newCarImagePath);
+                            Navigator.of(context).pop();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select a car and enter a plate number.")),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade700,
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          'Add Car',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showAppointmentDialog(BuildContext context, CarProvider carProvider) {
     final TextEditingController _dateController = TextEditingController();
     final TextEditingController _timeController = TextEditingController();
-    String selectedCar = '${_cars[_currentPage].name} - ${_cars[_currentPage].plateNumber}';
+    String selectedCar = '${carProvider.cars[carProvider.currentPage].name} - ${carProvider.cars[carProvider.currentPage].plateNumber}';
 
     showDialog(
       context: context,
@@ -379,26 +432,23 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Back Button and Title Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          Navigator.pop(context); // Closes the dialog
+                          Navigator.pop(context);
                         },
                       ),
                       const Text(
                         "Car Service",
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 48), // Spacer to balance the Row
+                      const SizedBox(width: 48),
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  /// 1. Car Selection
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text("1. Select your car", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -406,7 +456,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
                     value: selectedCar,
-                    items: _cars.map((car) {
+                    items: carProvider.cars.map((car) {
                       return DropdownMenuItem<String>(
                         value: '${car.name} - ${car.plateNumber}',
                         child: Text('${car.name} - ${car.plateNumber}'),
@@ -420,8 +470,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  /// 2. Date Picker
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text("2. Select the service date", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -448,8 +496,6 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   const SizedBox(height: 20),
-
-                  /// 3. Time Picker
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text("3. Select the service time", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -473,14 +519,14 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   const SizedBox(height: 30),
-
-                  /// Confirm Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.lightBlue[100],
                       foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(color: Colors.black, width: 1)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(color: Colors.black, width: 1),
+                      ),
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     ),
                     onPressed: () {

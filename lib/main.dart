@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:wms_mobile_application/providers/service_provider.dart';
+import 'package:wms_mobile_application/providers/car_provider.dart';
+
 import 'screens/home_page.dart';
 import 'screens/schedule_page.dart';
 import 'screens/profile_page.dart';
@@ -10,10 +13,13 @@ import 'constants/colors.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      // accessible for all pages
-        create: (context) => ServiceProvider(),
-        child: const MyApp(),
+    // Use MultiProvider to register all your app's providers
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ServiceProvider()),
+        ChangeNotifierProvider(create: (context) => CarProvider()), // Add CarProvider here
+      ],
+      child: const MyApp(),
     ),
   );
 }
