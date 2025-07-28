@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wms_mobile_application/constants/colors.dart';
 import 'package:wms_mobile_application/widgets/past_list.dart';
 import 'package:wms_mobile_application/widgets/on_progress_list.dart';
+import 'package:wms_mobile_application/widgets/upcoming_time_table.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
@@ -33,11 +34,12 @@ class _SchedulePageState extends State<SchedulePage> {
             children: [
               TabBar(tabs: myTabs),
 
+              SizedBox(height: 10),
               // Content of each tab bar
               Expanded(
                 child: TabBarView(
                   children: [
-                    Center(),
+                    Center(child: UpcomingTimeTable()),
 
                     Center(child: PastServicesList()),
                     Center(child: OnProgressServicesList()),

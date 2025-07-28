@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wms_mobile_application/models/service.dart';
 import 'package:wms_mobile_application/constants/colors.dart';
+import 'package:wms_mobile_application/widgets/progress_bar.dart';
 
 class ServiceCard extends StatelessWidget {
   final Service service;
@@ -8,113 +9,94 @@ class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.service});
 
   // Status for On progress Service
-  bool get isOnProgress => [
-    ServiceStatus.vehicle_received,
-    ServiceStatus.diagnosing,
-    ServiceStatus.in_progress,
-    ServiceStatus.ready_for_pickup,
-  ].contains(service.status);
+  bool _isOnProgress(ServiceStatus status) {
+    return [
+      ServiceStatus.vehicle_received,
+      ServiceStatus.diagnosing,
+      ServiceStatus.in_progress,
+      ServiceStatus.ready_for_pickup,
+    ].contains(status);
+  }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
       width: 320,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Card(
-        color: AppColors.lightGrey,
-        elevation: 0,
+        color: AppColors.white,
+        elevation: 1,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: AppColors.lightGrey, width: 1),
         ),
         child: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // Design for Past Service and On Progress Service
-              Text(service.title),
-              SizedBox(height: 8),
-              Text('Date: ${service.date}'),
-              SizedBox(height: 5),
-              Text('Time: ${service.time}'),
-              SizedBox(height: 5),
-              Text('Status: ${service.status.toString().split('.').last}'),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
 
-              // If it is On Progress service, create status progress bar
-              if(isOnProgress)...[
-                SizedBox(height: 12),
-                _buildProgressBar(service.status),
-                SizedBox(height: 6),
-                _buildProgressLabels(),
-              ],
-
-              // if status is ready_for_pickup, create done button
-              if (service.status == ServiceStatus.ready_for_pickup)
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-
-                    },
-                    child: const Text('Done'),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          service.title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Date: ${service.date}',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Time: ${service.time}',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Status: ${service.status.toString().split('.').last.replaceAll('_', ' ')}',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+
+                  // mark as done button
+                  if (service.status == ServiceStatus.ready_for_pickup)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: Size(110, 40),
+                        backgroundColor: AppColors.lightBlue,
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        )
+                      ),
+                      onPressed: () {},
+                      child: const Text('Marked As Done', style: TextStyle(fontSize: 12)),
+                    ),
+                ],
+              ),
+
+              /// progress bar
+              if (_isOnProgress(service.status)) ...[
+                SizedBox(height: 20),
+                ProgressBar(status: service.status),
+              ],
             ],
           ),
         ),
       ),
     );
   }
-
-  // progress bar
-  Widget _buildProgressBar(ServiceStatus currentStatus) {
-    // const stages = [
-    //   ServiceStatus.vehicle_received,
-    //   ServiceStatus.diagnosing,
-    //   ServiceStatus.in_progress,
-    //   ServiceStatus.ready_for_pickup,
-    // ];
-
-    // final currentIndex = stages.indexOf(currentStatus);
-
-      return Row(
-        // children: List.generate(stages.length, (index) {
-        //   bool isActive = index <= currentIndex;
-        //   return Expanded(
-        //     child: Row(
-        //       children: [
-        //         CircleAvatar(
-        //           radius: 10,
-        //           backgroundColor: isActive ? Colors.green : Colors.grey,
-        //           child: Text('${index + 1}',
-        //               style: TextStyle(fontSize: 10, color: Colors.white)),
-        //         ),
-        //         if (index != stages.length - 1)
-        //           Expanded(
-        //             child: Container(
-        //               height: 2,
-        //               color: isActive ? Colors.green : Colors.grey,
-        //             ),
-        //           ),
-        //       ],
-        //     ),
-        //   );
-        // }),
-      );
-  }
-
-  //Build stage labels like: Received | Diagnosing | ...
-  Widget _buildProgressLabels() {
-    // const labels = ['Received', 'Diagnosing', 'In Progress', 'Pickup'];
-    return Row(
-      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      // children: labels
-      //     .map((label) => Text(label, style: TextStyle(fontSize: 10)))
-      //     .toList(),
-    );
-  }
 }
-

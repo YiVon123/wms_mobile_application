@@ -5,14 +5,21 @@ class ServiceProvider extends ChangeNotifier {
   final List<Service> _services = [
     Service(
       title: 'Car Maintenance',
-      date: '2025-08-01',
+      date: '2025-07-01',
       time: '10:00 AM',
       // year month day hour min sec
-      dateTime: DateTime(2025, 8, 1, 10, 0),
+      dateTime: DateTime(2025, 7, 1, 10, 0),
       status: ServiceStatus.completed,
     ),
     Service(
       title: 'Oil Change',
+      date: '2025-10-10',
+      time: '10:00 AM',
+      dateTime: DateTime(2025, 10, 10, 10, 0),
+      status: ServiceStatus.ready_for_pickup,
+    ),
+    Service(
+      title: 'Engine',
       date: '2025-10-10',
       time: '10:00 AM',
       dateTime: DateTime(2025, 10, 10, 10, 0),
@@ -34,10 +41,38 @@ class ServiceProvider extends ChangeNotifier {
     ),
     Service(
       title: 'Oil Change',
-      date: '2025-9-10',
+      date: '2025-09-10',
+      time: '09:00 AM',
+      dateTime: DateTime(2025, 9, 10, 10, 0),
+      status: ServiceStatus.confirmed,
+    ),
+    Service(
+      title: 'Change',
+      date: '2025-09-10',
       time: '10:00 AM',
       dateTime: DateTime(2025, 9, 10, 10, 0),
       status: ServiceStatus.confirmed,
+    ),
+    Service(
+      title: 'Oil Change',
+      date: '2025-09-10',
+      time: '09:00 AM',
+      dateTime: DateTime(2025, 9, 10, 10, 0),
+      status: ServiceStatus.confirmed,
+    ),
+    Service(
+      title: 'Change',
+      date: '2025-09-10',
+      time: '10:00 AM',
+      dateTime: DateTime(2025, 9, 10, 10, 0),
+      status: ServiceStatus.confirmed,
+    ),
+    Service(
+      title: 'Car Maintenance',
+      date: '2025-09-10',
+      time: '10:00 AM',
+      dateTime: DateTime(2025, 9, 10, 10, 0),
+      status: ServiceStatus.diagnosing,
     ),
 
   ];
