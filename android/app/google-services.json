@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "347003680626",
+    "project_id": "wms-workshop",
+    "storage_bucket": "wms-workshop.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347003680626:android:d52c1a6b1fbb26daddcfeb",
+        "android_client_info": {
+          "package_name": "com.example.wms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvvgpYj1h1RWtlw2LtGFq9iu9EVMIgvKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347003680626:android:301a797350156d9eddcfeb",
+        "android_client_info": {
+          "package_name": "com.example.wms_mobile_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvvgpYj1h1RWtlw2LtGFq9iu9EVMIgvKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
