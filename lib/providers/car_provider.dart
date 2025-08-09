@@ -4,16 +4,6 @@ import '../models/car_model.dart';
 class CarProvider extends ChangeNotifier {
   // List of cars
   final List<Car> _cars = [
-    Car(
-      name: 'Proton Saga',
-      plateNumber: 'WC 1234',
-      imagePath: 'assets/images/proton_saga.png',
-    ),
-    Car(
-      name: 'Honda Civic',
-      plateNumber: 'ABC 5678',
-      imagePath: 'assets/images/honda_civic.png',
-    ),
   ];
 
   // Controller for the PageView

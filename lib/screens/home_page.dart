@@ -279,8 +279,11 @@ class HomePage extends StatelessWidget {
   void _showAddCarDialog(BuildContext context, CarProvider carProvider) {
     final List<Map<String, String>> carModels = [
       {'name': 'Perodua Myvi', 'imagePath': 'assets/images/perodua_myvi.png'},
+      {'name': 'Proton Saga', 'imagePath': 'assets/images/proton_saga.png'},
       {'name': 'Honda City', 'imagePath': 'assets/images/honda_city.png'},
+      {'name': 'Honda Civic', 'imagePath': 'assets/images/honda_civic.png'},
       {'name': 'Toyota Vios', 'imagePath': 'assets/images/toyota_vios.png'},
+      {'name': 'Toyota Altis', 'imagePath': 'assets/images/toyota_altis.png'},
     ];
 
     final TextEditingController plateController = TextEditingController();
